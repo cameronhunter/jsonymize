@@ -38,13 +38,14 @@ $ cat input.json | jsonymize -i email -i age
 Field names can be "fully qualified" using dot-notation:
 ```bash
 $ cat input.json
-{"name": "Cameron Hunter", "age": 30, "email": "hello@cameronhunter.co.uk"}
-$ cat input.json | jsonymize user.name -i user.email
+{"user":{"name": "Cameron Hunter", "age": 30, "email": "hello@cameronhunter.co.uk"}}
+$ cat input.json | jsonymize user.name user.age
 {"user":{"name":"Alejandro Mann","age":35,"email":"hello@cameronhunter.co.uk"}}
 ```
 
 ## Advanced Configuration
-A configuration file can be passed to jsonymize, allowing configurations to be shared and providing advanced overrides.
+A configuration file can be passed to jsonymize, providing advanced overrides
+and allowing configurations to be shared.
 
 Example configuration file:
 ```json
@@ -63,6 +64,13 @@ Example configuration file:
 }
 ```
 
+```bash
+$ cat input.json
+{"name": "Cameron Hunter", "age": 30, "email": "hello@cameronhunter.co.uk"}
+$ cat input.json | jsonymize -c ~/configuration.json
+{"name":"Alejandro Mann","age":30,"email":"mefulluv@bi.edu"}
+```
+
 [ChanceJS](https://github.com/victorquinn/chancejs) is used to generate all
-randomized data. A full list of supported generators are available on their
-[homepage](http://chancejs.com).
+randomized data. A full list of supported generators and their options is
+available on their [website](http://chancejs.com).

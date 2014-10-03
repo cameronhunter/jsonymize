@@ -50,7 +50,7 @@ over the data generators, as well as allowing configurations to be shared.
 Example configuration file:
 ```json
 {
-  "fields": ["name", "email"],
+  "fields": ["name", "cell"],
   "ignore": ["id", "message.timestamp"],
   "generators": {
     "cell": "phone",
@@ -66,9 +66,9 @@ Example configuration file:
 
 ```bash
 $ cat input.json
-{"name": "Cameron Hunter", "age": 30, "email": "hello@cameronhunter.co.uk"}
+{"name": "Cameron Hunter", "age": 30, "cell": "(939) 555-0113"}
 $ cat input.json | jsonymize -c ~/configuration.json
-{"name":"Alejandro Mann","age":30,"email":"mefulluv@bi.edu"}
+{"name":"Olive McGee","age":30,"cell":"(636) 555-3226"}
 ```
 
 [ChanceJS](https://github.com/victorquinn/chancejs) is used to generate all

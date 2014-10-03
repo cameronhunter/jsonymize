@@ -1,7 +1,7 @@
 {
   "name": "jsonymize",
   "version": "0.0.1",
-  "description": "Anonymize values in JSON data structures",
+  "description": "Anonymize JSON values, easily.",
   "main": "lib/jsonymize.js",
   "bin": {
     "jsonymize": "bin/jsonymize"

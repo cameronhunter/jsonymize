@@ -17,6 +17,10 @@
     "anonymise",
     "json"
   ],
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/cameronhunter/jsonymize.git"
+  },
   "author": "Cameron Hunter <hello@cameronhunter.co.uk> (http://www.cameronhunter.co.uk/)",
   "license": "MIT"
 }

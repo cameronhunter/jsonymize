@@ -1,0 +1,61 @@
+#!/usr/bin/env node
+var fs = require("fs");
+var cjson = require("cjson");
+var yargs = require("yargs")
+    .usage("Anonymize JSON values.\n\nUsage: jsonymize [fields]")
+    .options("i", {
+      alias: "ignore",
+      description: "JSON field to ignore (can be repeated multiple times)"
+    })
+    .options("c", {
+      alias: "config",
+      description: "Configuration file"
+    })
+    .options("h", {
+      alias: "help",
+      description: "Show this help message"
+    });
+
+var argv = yargs.argv;
+
+if (argv.help) {
+  yargs.showHelp();
+  return;
+}
+
+if (argv.config && !fs.existsSync(argv.config)) {
+  console.error("Configuration file \"" + argv.config + "\" does not exist.");
+  return;
+}
+
+var config = argv.config ? cjson.load(argv.config) : {};
+var fields = argv._ || config.fields || [];
+var ignore = argv.ignore || config.ignore || [];
+var overrides = config.overrides;
+
+var jsonymize = require("../lib/jsonymize");
+
+var stdin = process.stdin;
+var stderr = process.stderr;
+var stdout = process.stdout;
+
+var lines = [];
+
+stdin.resume();
+stdin.setEncoding("utf8");
+
+stdin.on("data", function(line) {
+  lines.push(line);
+});
+
+stdin.on("end", function () {
+  var json = JSON.parse(lines.join());
+
+  var anonymized = jsonymize(json, {
+    fields: (fields.length ? fields : undefined),
+    ignore: (ignore.length ? ignore : undefined),
+    overrides: overrides
+  });
+
+  stdout.write(anonymized + "\n");
+});

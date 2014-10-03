@@ -3,8 +3,11 @@
   "version": "0.0.1",
   "description": "Anonymize values in JSON data structures",
   "main": "lib/jsonymize.js",
-  "scripts": {
-    "test": "test/jsonymize.js"
+  "dependencies": {
+    "traverse": "~0.6.6",
+    "chance": "~0.6.1",
+    "yargs": "~1.3.1",
+    "cjson": "~0.3.0"
   },
   "keywords": [
     "anonymize",

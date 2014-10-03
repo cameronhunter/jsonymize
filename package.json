@@ -1,5 +1,5 @@
 {
-  "name": "jsonymizer",
+  "name": "jsonymize",
   "version": "0.0.1",
   "description": "Anonymize values in JSON data structures",
   "main": "lib/jsonymize.js",
@@ -8,6 +8,7 @@
   },
   "keywords": [
     "anonymize",
+    "anonymise",
     "json"
   ],
   "author": "Cameron Hunter <hello@cameronhunter.co.uk> (http://www.cameronhunter.co.uk/)",

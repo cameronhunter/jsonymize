@@ -32,7 +32,7 @@ if (argv.config && !fs.existsSync(argv.config)) {
 var config = argv.config ? cjson.load(argv.config) : {};
 var fields = argv._ || config.fields || [];
 var ignore = argv.ignore || config.ignore || [];
-var overrides = config.overrides;
+var generators = config.generators;
 
 process.stdin.resume();
 process.stdin.setEncoding("utf8");
@@ -48,7 +48,7 @@ process.stdin.on("end", function () {
   var anonymized = jsonymize(json, {
     fields: (fields.length ? fields : undefined),
     ignore: (ignore.length ? ignore : undefined),
-    overrides: overrides
+    generators: generators
   });
 
   process.stdout.write(anonymized + "\n");

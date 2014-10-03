@@ -44,15 +44,15 @@ $ cat input.json | jsonymize user.name user.age
 ```
 
 ## Advanced Configuration
-A configuration file can be passed to jsonymize, providing advanced overrides
-and allowing configurations to be shared.
+A configuration file can be passed to jsonymize, providing advanced control
+over the data generators, as well as allowing configurations to be shared.
 
 Example configuration file:
 ```json
 {
   "fields": ["name", "email"],
   "ignore": ["id", "message.timestamp"],
-  "overrides": {
+  "generators": {
     "cell": "phone",
     "text": {
       "generator": "sentence",

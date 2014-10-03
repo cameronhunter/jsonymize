@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+var jsonymize = require("../lib/jsonymize");
 var fs = require("fs");
 var cjson = require("cjson");
 var yargs = require("yargs")
@@ -9,7 +10,7 @@ var yargs = require("yargs")
     })
     .options("c", {
       alias: "config",
-      description: "Configuration file"
+      description: "Advanced configuration file"
     })
     .options("h", {
       alias: "help",
@@ -24,7 +25,7 @@ if (argv.help) {
 }
 
 if (argv.config && !fs.existsSync(argv.config)) {
-  console.error("Configuration file \"" + argv.config + "\" does not exist.");
+  console.error("Configuration file \"" + argv.config + "\" could not be read.");
   return;
 }
 
@@ -33,22 +34,15 @@ var fields = argv._ || config.fields || [];
 var ignore = argv.ignore || config.ignore || [];
 var overrides = config.overrides;
 
-var jsonymize = require("../lib/jsonymize");
-
-var stdin = process.stdin;
-var stderr = process.stderr;
-var stdout = process.stdout;
+process.stdin.resume();
+process.stdin.setEncoding("utf8");
 
 var lines = [];
-
-stdin.resume();
-stdin.setEncoding("utf8");
-
-stdin.on("data", function(line) {
+process.stdin.on("data", function(line) {
   lines.push(line);
 });
 
-stdin.on("end", function () {
+process.stdin.on("end", function () {
   var json = JSON.parse(lines.join());
 
   var anonymized = jsonymize(json, {
@@ -57,5 +51,5 @@ stdin.on("end", function () {
     overrides: overrides
   });
 
-  stdout.write(anonymized + "\n");
+  process.stdout.write(anonymized + "\n");
 });

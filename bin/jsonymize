@@ -26,8 +26,9 @@ if (argv.help) {
   return;
 }
 
-if (argv.config && !fs.existsSync(argv.config)) {
-  console.error("Configuration file \"" + argv.config + "\" could not be read.");
+var configPath = argv.config ? path.resolve(process.cwd(), argv.config) : undefined;
+if (configPath && !fs.existsSync(configPath)) {
+  console.error("Configuration file \"" + configPath + "\" could not be read.");
   return;
 }
 
@@ -48,6 +49,7 @@ jsonymize()
   .anonymize(process.stdin)
   .then(function(anonymized) {
     process.stdout.write(anonymized + "\n");
+    process.stdout.flush();
   }, function(error) {
     process.stderr.write("Error! " + JSON.stringify(error.thrown) + "\n");
   });

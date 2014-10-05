@@ -1,13 +1,11 @@
 #!/usr/bin/env node
 var jsonymize = require("../lib/jsonymize");
 var fs = require("fs");
+var path = require("path");
 var cjson = require("cjson");
+var check = require("check-types");
 var yargs = require("yargs")
     .usage("Anonymize JSON values.\n\nUsage: jsonymize [fields]")
-    .options("i", {
-      alias: "ignore",
-      description: "JSON field to ignore (can be repeated multiple times)"
-    })
     .options("e", {
       alias: "extension",
       description: "ChanceJS mixin providing custom generators"
@@ -34,22 +32,33 @@ if (argv.config && !fs.existsSync(argv.config)) {
 }
 
 var config = argv.config ? cjson.load(argv.config) : {};
-var generators = argv.generator || config.generators || {};
-var extensions = argv.extension || config.extensions || [];
+
+var fields = fallback(argv._, config.fields);
 var aliases = argv.alias || config.aliases || {};
-var fields = (argv._.length ? argv._ : undefined) || config.fields || [];
-var ignore = argv.ignore || config.ignore || [];
+var generators = argv.generator || config.generators || {};
+var extensions = fallback(argv.extension, config.extensions);
 
 process.stdin.resume();
 process.stdin.setEncoding("utf8");
 
-jsonymize(process.stdin, {
-  fields: (fields.length ? fields : undefined),
-  generators: generators,
-  aliases: aliases,
-  extensions: extensions
-}).anonymize().then(function(anonymized) {
-  process.stdout.write(anonymized + "\n");
-}, function(error) {
-  process.stderr.write("Error! " + JSON.stringify(error.thrown) + "\n");
-});
+jsonymize()
+  .aliases(aliases)
+  .fields(fields)
+  .generators(generators)
+  .extensions(extensions.map(function(extension) { return path.resolve(process.cwd(), extension); }))
+  .anonymize(process.stdin)
+  .then(function(anonymized) {
+    process.stdout.write(anonymized + "\n");
+  }, function(error) {
+    process.stderr.write("Error! " + JSON.stringify(error.thrown) + "\n");
+  });
+
+function fallback(args, config) {
+  if (args) {
+    return check.array(args) ? args : [args];
+  } else if (config) {
+    return config
+  } else {
+    return [];
+  }
+}

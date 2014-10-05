@@ -8,6 +8,10 @@ var yargs = require("yargs")
       alias: "ignore",
       description: "JSON field to ignore (can be repeated multiple times)"
     })
+    .options("e", {
+      alias: "extension",
+      description: "ChanceJS mixin providing custom generators"
+    })
     .options("c", {
       alias: "config",
       description: "Advanced configuration file"
@@ -30,26 +34,22 @@ if (argv.config && !fs.existsSync(argv.config)) {
 }
 
 var config = argv.config ? cjson.load(argv.config) : {};
-var fields = argv._ || config.fields || [];
+var generators = argv.generator || config.generators || {};
+var extensions = argv.extension || config.extensions || [];
+var aliases = argv.alias || config.aliases || {};
+var fields = (argv._.length ? argv._ : undefined) || config.fields || [];
 var ignore = argv.ignore || config.ignore || [];
-var generators = config.generators;
 
 process.stdin.resume();
 process.stdin.setEncoding("utf8");
 
-var lines = [];
-process.stdin.on("data", function(line) {
-  lines.push(line);
-});
-
-process.stdin.on("end", function () {
-  var json = JSON.parse(lines.join());
-
-  var anonymized = jsonymize(json, {
-    fields: (fields.length ? fields : undefined),
-    ignore: (ignore.length ? ignore : undefined),
-    generators: generators
-  });
-
+jsonymize(process.stdin, {
+  fields: (fields.length ? fields : undefined),
+  generators: generators,
+  aliases: aliases,
+  extensions: extensions
+}).anonymize().then(function(anonymized) {
   process.stdout.write(anonymized + "\n");
+}, function(error) {
+  process.stderr.write("Error! " + JSON.stringify(error.thrown) + "\n");
 });

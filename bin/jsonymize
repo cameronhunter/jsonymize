@@ -32,11 +32,10 @@ if (argv.config && !fs.existsSync(argv.config)) {
 }
 
 var config = argv.config ? cjson.load(argv.config) : {};
-
-var fields = fallback(argv._, config.fields);
-var aliases = argv.alias || config.aliases || {};
 var generators = argv.generator || config.generators || {};
-var extensions = fallback(argv.extension, config.extensions);
+var extensions = fallback(argv.extension, config.extensions, []);
+var aliases = argv.alias || config.aliases || {};
+var fields = (argv._.length ? argv._ : undefined) || config.fields || [];
 
 process.stdin.resume();
 process.stdin.setEncoding("utf8");
@@ -53,12 +52,12 @@ jsonymize()
     process.stderr.write("Error! " + JSON.stringify(error.thrown) + "\n");
   });
 
-function fallback(args, config) {
+function fallback(args, config, def) {
   if (args) {
     return check.array(args) ? args : [args];
   } else if (config) {
     return config
   } else {
-    return [];
+    return def;
   }
 }

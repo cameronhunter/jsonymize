@@ -34,7 +34,7 @@ if (configPath && !fs.existsSync(configPath)) {
 
 var config = argv.config ? cjson.load(argv.config) : {};
 var generators = argv.generator || config.generators || {};
-var extensions = fallback(argv.extension, config.extensions, []);
+var extensions = fallback(argv.extension, relative(argv.config, config.extensions), []);
 var aliases = argv.alias || config.aliases || {};
 var fields = (argv._.length ? argv._ : undefined) || config.fields || [];
 
@@ -61,5 +61,15 @@ function fallback(args, config, def) {
     return config
   } else {
     return def;
+  }
+}
+
+function relative(configPath, extensions) {
+  if (!configPath || !extensions) {
+    return extensions;
+  } else {
+    return extensions.map(function(extension) {
+      return path.join(path.dirname(configPath), extension);
+    });
   }
 }

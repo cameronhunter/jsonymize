@@ -51,7 +51,7 @@ const anonymizer = new Jsonymize({
   aliases: aliases,
   fields: fields,
   generators: generators,
-  extensions: extensions.map(_ => path.resolve(cwd(), _))
+  extensions: extensions.map(_ => require(path.resolve(cwd(), _)))
 });
 
 anonymizer.anonymize(stdin).then(anonymized => {

@@ -3,7 +3,7 @@ Anonymize JSON values, easily.
 
 ## Installation
 ```bash
-npm install -g jsonymize
+npm install -g babel jsonymize
 ```
 
 ## Usage

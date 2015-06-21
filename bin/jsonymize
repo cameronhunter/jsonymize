@@ -1,62 +1,70 @@
-#!/usr/bin/env node
-var jsonymize = require("../lib/jsonymize");
-var fs = require("fs");
-var path = require("path");
-var cjson = require("cjson");
-var check = require("check-types");
-var yargs = require("yargs")
-    .usage("Anonymize JSON values.\n\nUsage: jsonymize [fields]")
-    .options("e", {
-      alias: "extension",
-      description: "ChanceJS mixin providing custom generators"
-    })
-    .options("c", {
-      alias: "config",
-      description: "Advanced configuration file"
-    })
-    .options("h", {
-      alias: "help",
-      description: "Show this help message"
-    });
+#!/usr/bin/env babel-node
 
-var argv = yargs.argv;
+import Jsonymize from "../lib/jsonymize";
+
+import CJSON from "cjson";
+import Check from "check-types";
+import Yargs from "yargs";
+
+import fs from "fs";
+import path from "path";
+
+Yargs
+  .usage("Anonymize JSON values.\n\nUsage: jsonymize [fields]")
+  .options("e", {
+    alias: "extension",
+    description: "ChanceJS mixin providing custom generators"
+  })
+  .options("c", {
+    alias: "config",
+    description: "Advanced configuration file"
+  })
+  .options("h", {
+    alias: "help",
+    description: "Show this help message"
+  });
+
+const { argv } = Yargs;
+const { stdin, stdout, stderr, exit, cwd } = process;
+
+stdin.resume();
+stdin.setEncoding("utf8");
 
 if (argv.help) {
-  yargs.showHelp();
-  return;
+  Yargs.showHelp();
+  exit(1);
 }
 
-var configPath = argv.config ? path.resolve(process.cwd(), argv.config) : undefined;
+const configPath = argv.config ? path.resolve(cwd(), argv.config) : undefined;
 if (configPath && !fs.existsSync(configPath)) {
-  console.error("Configuration file \"" + configPath + "\" could not be read.");
-  return;
+  stderr.write(`Could not read configuration file "${configPath}"\n`);
+  exit(2);
 }
 
-var config = argv.config ? cjson.load(argv.config) : {};
-var generators = argv.generator || config.generators || {};
-var extensions = fallback(argv.extension, relative(argv.config, config.extensions), []);
-var aliases = argv.alias || config.aliases || {};
-var fields = (argv._.length ? argv._ : undefined) || config.fields || [];
+const config = argv.config ? CJSON.load(argv.config) : {};
+const generators = argv.generator || config.generators || {};
+const extensions = fallback(argv.extension, relative(argv.config, config.extensions), []);
+const aliases = argv.alias || config.aliases || {};
+const fields = (argv._.length ? argv._ : undefined) || config.fields || [];
 
-process.stdin.resume();
-process.stdin.setEncoding("utf8");
+const anonymizer = new Jsonymize({
+  aliases: aliases,
+  fields: fields,
+  generators: generators,
+  extensions: extensions.map(_ => require(path.resolve(cwd(), _)))
+});
 
-jsonymize()
-  .aliases(aliases)
-  .fields(fields)
-  .generators(generators)
-  .extensions(extensions.map(function(extension) { return path.resolve(process.cwd(), extension); }))
-  .anonymize(process.stdin)
-  .then(function(anonymized) {
-    process.stdout.write(anonymized + "\n");
-    process.stdout.flush();
-  }, function(error) {
-    process.stderr.write("Error! " + JSON.stringify(error.thrown) + "\n");
-  });
+anonymizer.anonymize(stdin).then(anonymized => {
+  stdout.write(`${JSON.stringify(anonymized)}\n`);
+  exit(0);
+}).catch(error => {
+  stderr.write(`Error! ${JSON.stringify(error.thrown)}\n`);
+  exit(3);
+});
 
 function fallback(args, config, def) {
   if (args) {
-    return check.array(args) ? args : [args];
+    return Check.array(args) ? args : [args];
   } else if (config) {
     return config
   } else {
@@ -68,8 +76,6 @@ function relative(configPath, extensions) {
   if (!configPath || !extensions) {
     return extensions;
   } else {
-    return extensions.map(function(extension) {
-      return path.join(path.dirname(configPath), extension);
-    });
+    return extensions.map(_ => path.join(path.dirname(configPath), _));
   }
 }

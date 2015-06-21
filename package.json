@@ -1,29 +1,27 @@
 {
   "name": "jsonymize",
-  "version": "1.0.0",
+  "author": "Cameron Hunter <hello@cameronhunter.co.uk> (http://www.cameronhunter.co.uk/)",
+  "version": "2.0.0",
   "description": "Anonymize JSON values, easily.",
+  "license": "MIT",
   "main": "lib/jsonymize.js",
   "bin": {
     "jsonymize": "bin/jsonymize"
   },
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/cameronhunter/jsonymize.git"
+  },
   "dependencies": {
-    "oboe": "*",
-    "promise": "*",
-    "check-types": "*",
-    "extend": "*",
     "chance": "~0.7.3",
-    "yargs": "~1.3.1",
-    "cjson": "~0.3.0"
+    "check-types": "~3.3.0",
+    "cjson": "~0.3.1",
+    "oboe": "~2.1.2",
+    "yargs": "~1.3.3"
   },
   "keywords": [
     "anonymize",
     "anonymise",
     "json"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "http://github.com/cameronhunter/jsonymize.git"
-  },
-  "author": "Cameron Hunter <hello@cameronhunter.co.uk> (http://www.cameronhunter.co.uk/)",
-  "license": "MIT"
+  ]
 }

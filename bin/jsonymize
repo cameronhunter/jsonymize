@@ -47,20 +47,20 @@ const extensions = fallback(argv.extension, relative(argv.config, config.extensi
 const aliases = argv.alias || config.aliases || {};
 const fields = (argv._.length ? argv._ : undefined) || config.fields || [];
 
-new Jsonymize()
-      .aliases(aliases)
-      .fields(fields)
-      .generators(generators)
-      .extensions(extensions.map(_ => path.resolve(cwd(), _)))
-      .anonymize(stdin)
-      .then(anonymized => {
-        stdout.write(`${JSON.stringify(anonymized)}\n`);
-        exit(0);
-      })
-      .catch(error => {
-        stderr.write(`Error! ${JSON.stringify(error.thrown)}\n`);
-        exit(3);
-      });
+const anonymizer = new Jsonymize({
+  aliases: aliases,
+  fields: fields,
+  generators: generators,
+  extensions: extensions.map(_ => path.resolve(cwd(), _))
+});
+
+anonymizer.anonymize(stdin).then(anonymized => {
+  stdout.write(`${JSON.stringify(anonymized)}\n`);
+  exit(0);
+}).catch(error => {
+  stderr.write(`Error! ${JSON.stringify(error.thrown)}\n`);
+  exit(3);
+});
 
 function fallback(args, config, def) {
   if (args) {
